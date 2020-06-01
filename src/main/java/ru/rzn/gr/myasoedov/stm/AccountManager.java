@@ -3,7 +3,9 @@ package ru.rzn.gr.myasoedov.stm;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.Stack;
 import java.util.concurrent.locks.Lock;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -31,37 +33,35 @@ public class AccountManager {
     }
 
     public static int sum(Account[] accounts) {
-        List<Account> sortedAccounts = Stream.of(accounts)
-                .sorted(Comparator.comparingInt(a -> a.id))
-                .collect(Collectors.toList());
-        for (Account sortedAccount : sortedAccounts) {
-            sortedAccount.lock.readLock().lock();
-        }
-
-        int sum;
-        try {
-            sum = sortedAccounts.stream().mapToInt(a -> a.balance).sum();
-        } finally {
-            for (Account sortedAccount : sortedAccounts) {
-                sortedAccount.lock.readLock().unlock();
-            }
-        }
-        return sum;
+        return lockFunc(
+                accounts,
+                accountList -> accountList.stream().mapToInt(a -> a.balance).sum()
+        );
     }
 
     public static String toString(Account[] accounts) {
+        return lockFunc(
+                accounts,
+                accountList -> accountList.stream().map(Account::toString).collect(Collectors.joining(" "))
+        );
+    }
+
+    private static <T> T lockFunc(Account[] accounts, Function<List<Account>, T> function) {
         List<Account> sortedAccounts = Stream.of(accounts)
                 .sorted(Comparator.comparingInt(a -> a.id))
                 .collect(Collectors.toList());
+        Stack<Lock> locks = new Stack<>();
         for (Account sortedAccount : sortedAccounts) {
             sortedAccount.lock.readLock().lock();
+            locks.push(sortedAccount.lock.readLock());
         }
-        String result;
+        T result;
         try {
-            result = sortedAccounts.stream().map(Account::toString).collect(Collectors.joining(" "));
+            result = function.apply(sortedAccounts);
         } finally {
-            for (Account sortedAccount : sortedAccounts) {
-                sortedAccount.lock.readLock().unlock();
+            while (!locks.isEmpty()) {
+                Lock lock = locks.pop();
+                lock.unlock();
             }
         }
         return result;

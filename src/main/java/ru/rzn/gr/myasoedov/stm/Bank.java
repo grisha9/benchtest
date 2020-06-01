@@ -16,6 +16,7 @@ public class Bank {
                 new Account(100), new Account(0),
                 new Account(100), new Account(0),
                 new Account(100), new Account(0),
+                new Account(100), new Account(0),
                 new Account(100), new Account(0)};
     }
 
