@@ -13,6 +13,15 @@ public class AccountManager {
     private AccountManager() {
     }
 
+    public int getBalance(Account account) {
+        account.lock.readLock().lock();
+        try {
+            return account.balance;
+        } finally {
+            account.lock.readLock().unlock();
+        }
+    }
+
     public static void transfer(Account from, Account to, int amount) {
         Lock firstLock = from.id < to.id ? from.lock.writeLock() : to.lock.writeLock();
         Lock secondLock = from.id >= to.id ? from.lock.writeLock() : to.lock.writeLock();

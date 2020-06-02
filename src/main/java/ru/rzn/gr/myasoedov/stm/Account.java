@@ -6,12 +6,12 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 /**
  * Created by grisha on 26.05.20.
  */
-public class Account {
+class Account {
     final int id = IdGenerator.id.incrementAndGet();
     final ReadWriteLock lock = new ReentrantReadWriteLock();
     int balance;
 
-    public Account(int balance) {
+    Account(int balance) {
         this.balance = balance;
     }
 
