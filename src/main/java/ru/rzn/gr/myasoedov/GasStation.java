@@ -15,17 +15,15 @@ public class GasStation {
     public static String GasStation(String[] strArr) {
         int stationCount = Integer.valueOf(strArr[0]);
         List<Station> stations = IntStream.range(1, strArr.length)
-                .mapToObj(value -> {
-                    String[] split = strArr[value].split(":");
-                    return new Station(Integer.valueOf(split[0]), Integer.valueOf(split[1]));
-                })
+                .mapToObj(value -> strArr[value].split(":"))
+                .map(split -> new Station(Integer.valueOf(split[0]), Integer.valueOf(split[1])))
                 .collect(Collectors.toList());
 
         for(int i = 0; i < stationCount; i++) {
             int currentGas = 0;
             boolean possible = true;
-            for(int j = i; j < i + stationCount; j++) {
-                if (!possible) {
+            for(int j = i; j < i + stationCount; j++) { //i + stationCount ошибка с верхней границей цикла
+                if (!possible) {//лишние итерации
                     break;
                 }
                 Station station = stations.get(j % stationCount);
@@ -33,6 +31,36 @@ public class GasStation {
                 currentGas -= station.gasForNext;
                 if (currentGas < 0) {
                     possible = false;
+                }
+            }
+            if (possible) {
+                return String.valueOf(i + 1);
+            }
+        }
+        return "-1";
+    }
+
+    public static String GasStation1(String[] strArr) {
+        int stationCount = Integer.valueOf(strArr[0]);
+        List<Station> stations = IntStream.range(1, strArr.length)
+                .mapToObj(value -> strArr[value].split(":"))
+                .map(split -> new Station(Integer.valueOf(split[0]), Integer.valueOf(split[1])))
+                .collect(Collectors.toList());
+
+        int i = 0;
+        while (i < stationCount){
+            int currentGas = 0;
+            boolean possible = true;
+            for(int j = i; j < i + stationCount; j++) { //i + stationCount ошибка с верхней границей цикла
+                if (!possible) {//лишние итерации
+                    break;
+                }
+                Station station = stations.get(j % stationCount);
+                currentGas += station.gasAmount;
+                currentGas -= station.gasForNext;
+                if (currentGas < 0) {
+                    possible = false;
+                    i = j + 1;
                 }
             }
             if (possible) {
@@ -64,6 +92,8 @@ public class GasStation {
     public static void main(String[] args) {
         String[] ss =  {"4","1:1","2:2","1:2","0:1"};
         String[] ss1 = {"4","0:1","2:2","1:2","3:1"};
+
+        String s1 = GasStation1(ss1);
         String s = GasStation(ss);
         System.out.println(s);
 
