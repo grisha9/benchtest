@@ -9,8 +9,11 @@
     <version>1.0-SNAPSHOT</version>
 
     <properties>
-        <maven.compiler.source>1.8</maven.compiler.source>
-        <maven.compiler.target>1.8</maven.compiler.target>
+        <maven.compile.encoding>UTF-8</maven.compile.encoding>
+        <maven.compiler.source>11</maven.compiler.source>
+        <maven.compiler.target>11</maven.compiler.target>
+        <java.version>11</java.version>
+        <junit.version>5.7.0</junit.version>
     </properties>
 
     <dependencies>
@@ -41,7 +44,12 @@
             <artifactId>jackson-databind</artifactId>
             <version>2.9.9.1</version>
         </dependency>
-
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-engine</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
 
     </dependencies>
 
